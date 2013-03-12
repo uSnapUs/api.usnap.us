@@ -11,7 +11,7 @@ module.exports = {
     }
   , production: {
      root: require('path').normalize(__dirname + '/..'),
-     heroapp: {
+     app: {
         name: 'usnap.us'
       },
       db: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb',
