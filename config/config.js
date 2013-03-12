@@ -10,6 +10,10 @@ module.exports = {
       db: 'mongodb://localhost/noobjs_test',
     }
   , production: {
-      db: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb'; 
+     root: require('path').normalize(__dirname + '/..'),
+     heroapp: {
+        name: 'usnap.us'
+      },
+      db: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb',
     }
 }
