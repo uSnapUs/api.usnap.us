@@ -7,7 +7,7 @@ module.exports = {
       db: 'mongodb://localhost/noobjs_dev',
     }
   , test: {
-      db: 'mongodb://localhost/noobjs_dev',
+      db: 'mongodb://localhost/noobjs_test',
     }
   , production: {
 
