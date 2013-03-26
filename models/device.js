@@ -16,7 +16,7 @@ var DeviceSchema = new Schema({
   name: {type:String,required:true},
   email: String,
   guid: {type:String,required:true},
-  facebookId:String,
+  facebook_id:String,
   hashed_token: String,
   salt: String,
 })

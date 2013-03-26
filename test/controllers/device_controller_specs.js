@@ -5,125 +5,274 @@ var devices = require("../../controllers/device_controller");
 var should = require('should');
 var sinon = require('sinon');
 describe('DeviceController',function(){
-	describe('#register with new device',function(done){
-		var _result;
-		var _guid = "0F0F187A-9AD5-461A-BB56-810BFEF41553";
-		var _saved_device;
-		var _saved_callback;
-		var _stubModel;
-		var _statusCode;
-		before(function(done){
-			var cb = function(callback){
-				_saved_device = this;
-				_saved_callback = callback;
-				if (callback) {
-					callback();
-					done();
-				}
-				else{
-					done();
-				}
-				
-					
-			};
-			_stubModel = sinon.stub(Device.prototype, 'save',cb);
-			
-			var res={
-				status:function(status_code)
-				{
-					_statusCode = status_code;
-				},
-				send:function(object){
-					_result = object;
-				}
-			};
-			
-			var req={
-				body:{
-					guid:_guid,
-					name:"name"
-				}
-			};
-
-			devices.register(req,res);
-		});
-		after(function(){
-			_stubModel.restore();
-		});
-    	it('should have saved a device',function(){
-    		should.exist(_saved_device);
-    	});
-    	it('should have saved correct guid',function(){
-    		_saved_device.guid.should.equal(_guid);
-    	});
-		it('should return a result',function(){
-			should.exist(_result);
-		});
-		it('should return a device token',function(){
-			_result.should.equal(_saved_device);
-		});
-		it('should return correct device',function(){
-			_saved_device.authenticate(_result.token).should.be.true;
-		});
-		
+	before(function(){
+		mongoose.connect(config.db);
 	});
-describe('#register with an invalid new device', function(done){
-	var _result;
-	var _guid = "0F0F187A-9AD5-461A-BB56-810BFEF41553";
-		var _saved_device;
-var _statusCode;
-	var _stubModel;
- 
-      before(function(done){
-			var cb = function(callback){
-				_saved_device = this;
-				_saved_callback = callback;
-				if (callback) {
-					callback();
-				}
-				else{
-				}
-				
-					
+	describe('register with a new device (minimum fields)',function(){
+		var _posted_model = {guid:'guid',name:'name'};
+		var _result;
+		var _status_code;
+		before(function(done){
+			var req = {
+				body: _posted_model
 			};
-			_stubModel = sinon.stub(Device.prototype, 'save',cb);
-			
+
+
 			var res={
 				status:function(status_code)
 				{
-					_statusCode = status_code;
+					_status_code = status_code;
 				},
 				send:function(object){
 					_result = object;
 					done();
 				}
 			};
-			
-			var req={
-				body:{
-					guid:_guid,
-				}
-			};
-
 			devices.register(req,res);
 		});
-		after(function(){
-			_stubModel.restore();
+		it("should create a new device",function(done){
+			Device.count({},function(err,count){
+				count.should.equal(1);
+				done();
+			});
 		});
-    	it('should not have saved a device',function(){
-    		should.not.exist(_saved_device);
-    	});
-		it('should return a result',function(){
-			should.exist(_result);
+
+		it('should create device with correct guid',function(done){
+			Device.count({guid:_posted_model.guid},function(err,count){
+				count.should.equal(1);
+				done();
+			});
 		});
-		it('should return the error',function(){
+		it('should save all the fields',function(done){
+			Device.findOne({guid:_posted_model.guid},function(err,saved){
+				saved.guid.should.equal(_posted_model.guid);
+				saved.name.should.equal(_posted_model.name);
+				done();
+			});
+		});
+		it('should return correct device',function(done){
+			Device.findOne({guid:_posted_model.guid},function(err,saved){
+				_result.guid.should.equal(saved.guid);
+				_result.id.should.equal(saved.id);
+				_result.name.should.equal(saved.name);
+				done();
+			});
+		});
+		it('should return token',function(){
+			_result.token.should.exist;
+		});
+		after(function(done){
+			Device.remove({},function(){
+				done();
+			});
+		});
+	});
+
+	describe('register with a new device (all fields)',function(){
+		var _posted_model = {guid:'guid',name:'name',facebook_id:'facebook_id'};
+		var _result;
+		var _status_code;
+		before(function(done){
+			var req = {
+				body: _posted_model
+			};
+
+
+			var res={
+				status:function(status_code)
+				{
+					_status_code = status_code;
+				},
+				send:function(object){
+					_result = object;
+					done();
+				}
+			};
+			devices.register(req,res);
+		});
+		it("should create a new device",function(done){
+			Device.count({},function(err,count){
+				count.should.equal(1);
+				done();
+			});
+		});
+
+		it('should create device with correct guid',function(done){
+			Device.count({guid:_posted_model.guid},function(err,count){
+				count.should.equal(1);
+				done();
+			});
+		})
+		it('should save all the fields',function(done){
+			Device.findOne({guid:_posted_model.guid},function(err,saved){
+				saved.guid.should.equal(_posted_model.guid);
+				saved.name.should.equal(_posted_model.name);
+				saved.facebook_id.should.equal(_posted_model.facebook_id);
+				done();
+			});
+		});
+		it('should return correct device',function(done){
+			Device.findOne({guid:_posted_model.guid},function(err,saved){
+				_result.guid.should.equal(saved.guid);
+				_result.id.should.equal(saved.id);
+				_result.name.should.equal(saved.name);
+				_result.facebook_id.should.equal(saved.facebook_id);
+				done();
+			});
+		});
+		it('should return token',function(){
+			_result.token.should.exist;
+		});
+		after(function(done){
+			Device.remove({},function(){
+				done();
+			});
+		});
+	});
+
+	describe('register with an existing guid',function(){
+		var _posted_model = {guid:'guid',name:'name'};
+		var _result;
+		var _status_code;
+		before(function(done){
+			var existing_device = new Device(_posted_model);
+			existing_device.name = 'existing';
+			existing_device.save(function(){
+				var req = {
+					body: _posted_model
+				};
+
+
+				var res={
+					status:function(status_code){
+					_status_code = status_code;
+					},
+					send:function(object){
+					_result = object;
+						done();
+					}
+				};
+				devices.register(req,res);
+			});
+		});
+		it("should create a new device",function(done){
+			Device.count({},function(err,count){
+				count.should.equal(1);
+				done();
+			});
+		});
+
+		it('should create device with correct guid',function(done){
+			Device.count({guid:_posted_model.guid},function(err,count){
+				count.should.equal(1);
+				done();
+			});
+		})
+		it('should return correct device',function(done){
+			Device.findOne({guid:_posted_model.guid},function(err,saved){
+				_result.guid.should.equal(saved.guid);
+				_result.id.should.equal(saved.id);
+				_result.name.should.equal(saved.name);
+				done();
+			});
+		});
+		it('should not return token',function(){
+			should.not.exist(_result.token);
+		});
+		after(function(done){
+			Device.remove({},function(){
+				done();
+			});
+		});
+	});
+	describe('register without specifying a guid',function(){
+		var _posted_model = {name:'name'};
+		var _result;
+		var _status_code;
+		before(function(done){
+			var req = {
+				body: _posted_model
+			};
+
+
+			var res={
+				status:function(status_code)
+				{
+					_status_code = status_code;
+				},
+				send:function(object){
+					_result = object;
+					done();
+				}
+			};
+			devices.register(req,res);
+		});
+		it("should not create a new device",function(done){
+			Device.count({},function(err,count){
+				count.should.equal(0);
+				done();
+			});
+		});
+		it('should return an error',function(){
+			_result.errors.guid.type.should.equal('required');
+		});
+		it('should return a 400 status code',function(){
+			_status_code.should.equal(400);
+		});
+		after(function(done){
+			Device.remove({},function(){
+				done();
+			});
+		});
+
+	});
+	describe('register without specifying a name',function(){
+		var _posted_model = {guid:'guid'};
+		var _result;
+		var _status_code;
+		before(function(done){
+			var req = {
+				body: _posted_model
+			};
+
+
+			var res={
+				status:function(status_code)
+				{
+					_status_code = status_code;
+				},
+				send:function(object){
+					_result = object;
+					done();
+				}
+			};
+			devices.register(req,res);
+		});
+		it("should not create a new device",function(done){
+			Device.count({},function(err,count){
+				count.should.equal(0);
+				done();
+			});
+		});
+		it('should return an error',function(){
 			_result.errors.name.type.should.equal('required');
 		});
 		it('should return a 400 status code',function(){
-			_statusCode.should.equal(400);
-		})
-	
-		  
+			_status_code.should.equal(400);
+		});
+		after(function(done){
+			Device.remove({},function(){
+				done();
+			});
+		});
 
-})
+	});
+	after(function(done){
+		Device.remove({},function(){	
+			mongoose.disconnect(function(){
+					done();
+			});			
+		});
+	
+	});
 });
