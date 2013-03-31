@@ -14,8 +14,8 @@ var express = require('express'),
   var env = process.env.NODE_ENV || 'development',
     config = require('./config/config')[env],
     mongoose = require('mongoose'),
-    auth = require('./config/middleware/authorisation'),
-    Device = mongoose.model('Device');
+    auth = require('./config/middleware/authorisation');
+
 
   // Bootstrap db connection
   mongoose.connect(config.db)
@@ -23,13 +23,15 @@ var express = require('express'),
   // Bootstrap models
   var models_path = __dirname + '/models'
   fs.readdirSync(models_path).forEach(function(file) {
-    require(models_path + '/' + file)
+    require(models_path + '/' + file);
   })
 
   var app = express();
 
   require('./config/express')(app, config, passport)
   require('./config/routes')(app, passport, auth)
+
+  var Device = mongoose.model('Device');
 
   passport.use(new BasicStrategy(
 
