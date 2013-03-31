@@ -16,7 +16,16 @@
     "async":"*",
     "underscore": "*",
     "passport": "*",
+    "passport-http": "*",
+    "moment": "*",
+    "knox":"*",
+    "imagemagick":"*"
+  },
+  "devDependencies":{
     "should": "*",
-    "sinon": "*"
+    "sinon": "*",
+    "mocha":"*",
+    "zombie":"*",
+    "supertest":"*"
   }
 }
