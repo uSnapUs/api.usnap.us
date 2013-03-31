@@ -37,7 +37,8 @@ exports.create = function(req, res,next) {
 exports.delete = function(req,res,next){
   var Device = mongoose.model('Device');
   Device.remove({},function(){
-     res.status(200);
-     res.send({});     
+
   });
+  res.status(200);
+  return;
 };
