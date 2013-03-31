@@ -16,7 +16,6 @@ var express = require('express'),
     mongoose = require('mongoose'),
     auth = require('./config/middleware/authorisation');
 
-
   // Bootstrap db connection
   mongoose.connect(config.db)
 
