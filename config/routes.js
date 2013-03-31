@@ -9,4 +9,5 @@ module.exports = function (app, passport, auth) {
    app.post('/devices',device_controller.create);
    app.post('/events', passport.authenticate('basic', { session: false }),event_controller.create);
    app.post('/event/:event_code/photos',photo_controller.create);
+   app.delete('/devices',device_controller.delete);
 }
