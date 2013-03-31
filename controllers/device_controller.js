@@ -34,3 +34,9 @@ exports.create = function(req, res,next) {
     });
   })(req,res,next);
 };
+exports.delete = function(req,res,next){
+  Device.remove({},function(){
+     res.status(200);
+     res.send({});     
+  });
+};
