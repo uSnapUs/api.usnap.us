@@ -33,7 +33,6 @@ exports.create = function(req, res) {
       im.identify(req.files.photo.path, function(err, features) {
         if (err) throw err;
         var s3id;
-        console.log(features);
         existing_event.photos.push(req.body);
         existing_event.save(function(err, saved_event) {
           if (!err) {

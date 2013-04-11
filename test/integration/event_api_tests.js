@@ -90,6 +90,114 @@ describe('event api', function() {
 			});
 		});
 	});
+	describe('get event with existing code, authorised', function() {
+		var ev;
+		before(function(done) {
+			ev = new Event({
+				name: "My New Event",
+				location: [-41.154469, 175.011968],
+				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+				start_date: "2013-01-01T19:00:00",
+				end_date: "2013-01-02T00:00:00"
+			});
+			ev.save(function() {
+				request(http.createServer(app))
+					.get('/event/' + ev.code)
+					.set('Content-Type', 'application/json')
+					.auth(registered_device.guid, registered_device.token)
+					.send({
+					name: "My New Event",
+					location: [-41.154469, 175.011968],
+					address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+					start_date: "2013-01-01T19:00:00",
+					end_date: "2013-01-02T00:00:00"
+				})
+					.end(function(err, res) {
+					result = res;
+					done();
+				});
+			});
+
+		});
+		it('should return an ok status', function() {
+			result.statusCode.should.equal(200);
+		});
+		it('should retun the event with the correct code', function() {
+			result.body.code.should.equal(ev.code);
+		});
+		after(function(done) {
+			Event.remove({}, function() {
+				done();
+			});
+		});
+	});
+	describe('get event with non existing code, authorised', function() {
+		before(function(done) {
+
+			request(http.createServer(app))
+				.get('/event/nocode')
+				.set('Content-Type', 'application/json')
+				.auth(registered_device.guid, registered_device.token)
+				.send({
+				name: "My New Event",
+				location: [-41.154469, 175.011968],
+				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+				start_date: "2013-01-01T19:00:00",
+				end_date: "2013-01-02T00:00:00"
+			})
+				.end(function(err, res) {
+				result = res;
+				done();
+			});
+		});
+		it('should return a not found status', function() {
+			result.statusCode.should.equal(404);
+		});
+		after(function(done) {
+			Event.remove({}, function() {
+				done();
+			});
+		});
+	});
+	describe('get event with existing code, unauthorised', function() {
+		var ev;
+		before(function(done) {
+			ev = new Event({
+				name: "My New Event",
+				location: [-41.154469, 175.011968],
+				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+				start_date: "2013-01-01T19:00:00",
+				end_date: "2013-01-02T00:00:00"
+			});
+			ev.save(function() {
+				request(http.createServer(app))
+					.get('/event/' + ev.code)
+					.set('Content-Type', 'application/json')
+					.auth(registered_device.guid, 'token')
+					.send({
+					name: "My New Event",
+					location: [-41.154469, 175.011968],
+					address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+					start_date: "2013-01-01T19:00:00",
+					end_date: "2013-01-02T00:00:00"
+				})
+					.end(function(err, res) {
+					result = res;
+					done();
+				});
+			});
+
+		});
+		it('should return an unauthorised status', function() {
+			result.statusCode.should.equal(401);
+		});
+		after(function(done) {
+			Event.remove({}, function() {
+				done();
+			});
+		});
+	});
+
 	after(function(done) {
 		Event.remove({}, function() {
 			Device.remove({}, function() {

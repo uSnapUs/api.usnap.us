@@ -33,7 +33,7 @@ describe('photo api', function() {
 			});
 		});
 	});
-	describe('post new event, authorised as a registered device', function() {
+	describe('post new photo, authorised as a registered device', function() {
 		before(function(done) {
 			request(http.createServer(app))
 				.post('/event/' + registered_event.code + '/photos')

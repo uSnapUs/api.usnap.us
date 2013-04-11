@@ -240,6 +240,9 @@ describe('event controller', function() {
 			})
 		});
 	});
+	describe('#get event by code',function(){
+		
+	});
 	after(function(done) {
 		Event.remove({}, function() {
 			mongoose.disconnect(function() {
