@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
-<service_bundle type="manifest" name="node-api-stage-service">
-  <service name="sites/api-stage" type="service" version="1">
+<service_bundle type="manifest" name="node-api-production-service">
+  <service name="sites/api-production" type="service" version="1">
 
     <create_default_instance enabled="true"/>
 
@@ -15,20 +15,20 @@
       <service_fmri value="svc:/system/filesystem/local"/>
     </dependency>
 
-    <method_context working_directory="/var/w/stage/api">
+    <method_context working_directory="/var/w/production/api">
       <method_credential user="admin" group="staff" privileges='basic,net_privaddr'  />
       <method_environment>
         <envvar name="PATH" value="/home/admin/local/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin"/>
         <envvar name="HOME" value="/home/admin"/>
-        <envvar name="NODE_ENV" value="stage"/>
-        <envvar name="PORT" value="3000"/>
+        <envvar name="NODE_ENV" value="production"/>
+        <envvar name="PORT" value="3001"/>
       </method_environment>
     </method_context>
 
     <exec_method
       type="method"
       name="start"
-      exec="/opt/local/bin/node /var/w/stage/api/run.js"
+      exec="/opt/local/bin/node /var/w/production/api/run.js"
       timeout_seconds="60"/>
 
     <exec_method
@@ -51,7 +51,7 @@
 
     <template>
       <common_name>
-        <loctext xml:lang="C">node.js api-stage service</loctext>
+        <loctext xml:lang="C">node.js api-production service</loctext>
       </common_name>
     </template>
 
