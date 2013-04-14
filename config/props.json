@@ -2,5 +2,5 @@
 	"version" : "0.0.5",
 	"siteLocation" : "/var/w/",
 	"siteName" : "api",
-	"state" : "live"
+	"state" : "stage"
 }
