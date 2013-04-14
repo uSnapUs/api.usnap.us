@@ -10,9 +10,9 @@ module.exports = function (app, passport, auth) {
 		var Event = mongoose.model('Event');
 		Event.count({}, function(err, count) {
 				if(err){
-					 res.status(599);
+					res.status(500);
         			res.send(err);
-					
+					return;
 				}
 				res.status(200);
         		res.send({status:"ok"});
