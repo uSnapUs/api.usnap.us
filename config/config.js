@@ -38,7 +38,7 @@ module.exports = {
      app: {
         name: 'usnap.us'
       },
-      db: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb',
+      db: 'mongodb://usnap_us_app:QxFFvTrEtcVXCWLgko9XrBi7xFPWhGzTuurq@dharma.mongohq.com:10005/usnap_us',
       aws:{
           key:process.env.S3_KEY,
           secret:process.env.S3_SECRET
