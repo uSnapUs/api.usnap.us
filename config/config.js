@@ -23,7 +23,7 @@ module.exports = {
       }
     }
   , stage: {
-    db: 'mongodb://admin:AAtCX~.#It@localhost/api_usnap_us_stage',
+    db: 'mongodb://usnap_us_app:uPKR8eUMZZLixFRvLqjAJFwMhYw3udfwrxbQ@dharma.mongohq.com:10001/usnap_us_stage',
      app: {
         name: 'usnap.us'
       },
