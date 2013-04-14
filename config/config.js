@@ -12,6 +12,9 @@ module.exports = {
       }
     }
   , test: {
+     app: {
+        name: 'usnap.us'
+      },
       db: 'mongodb://localhost/noobjs_test',
       aws:{
         key:'AKIAJ2HIO2X2PG5ZTMRA',
@@ -21,6 +24,9 @@ module.exports = {
     }
   , stage: {
     db: 'mongodb://localhost/api_usnap_us_stage',
+     app: {
+        name: 'usnap.us'
+      },
     aws:{
        key:'AKIAJ2HIO2X2PG5ZTMRA',
        secret:'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',
