@@ -116,12 +116,12 @@ task('symlink-live', ["load-props", "create-versioned-dir", "move-files"], funct
 	var exec = require('child_process').exec,
 			ln;
 	
-	console.log(("    Executing command:\n    $ rm " + livePath + " && ln -sv " + versionedPath + " " + livePath).grey);
+	console.log(("    Executing command:\n    $ rm " + livePath + " && ln -s -v " + versionedPath + " " + livePath).grey);
 	// Symlink to the versioned directory
 	exec("rm "+livePath,function(error1,stdout1,stderr1){
 		console.log(error1);
 		console.log(stderr1);
-		ln = exec("ln -sv " + versionedPath + " " + livePath, function (error, stdout, stderr) {
+		ln = exec("ln -s -v " + versionedPath + " " + livePath, function (error, stdout, stderr) {
 			if (error !== null) {
 				console.log(error);
 				throw error;
