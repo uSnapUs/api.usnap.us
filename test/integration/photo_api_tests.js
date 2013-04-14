@@ -22,7 +22,7 @@ describe('photo api', function() {
 		});
 		registered_event = new Event({
 			name: "My New Event",
-			location: [-41.154469, 175.011968],
+			location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 			address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 			start_date: "2013-01-01T19:00:00",
 			end_date: "2013-01-02T00:00:00"

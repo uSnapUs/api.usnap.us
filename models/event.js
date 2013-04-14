@@ -25,7 +25,7 @@ var PhotoSchema = new Schema({
 var EventSchema = new Schema({
   name: {type:String,required:true},
   creation_date_utc:{type:Date,default:moment.utc(),required:true},
-  location:{type:[Number],index:'2d',required:true},
+  location:{type:{type:String},coordinates:[]},
   address:{type:String},
   start_date:{type:Date,required:true},
   end_date:{type:Date,required:true},
@@ -33,8 +33,8 @@ var EventSchema = new Schema({
   is_public:{type:Boolean,required:true,default:false},
   photos:[PhotoSchema]
 });
-
-
+EventSchema.index({location:'2dsphere'});
+EventSchema.path('location.coordinates').required(true);
 
 EventSchema.pre('save', function(next) {
   if (!this.isNew) return next();
@@ -65,11 +65,11 @@ EventSchema.options.toJSON.transform=function(doc,ret,options){
 EventSchema.path('name').validate(function (name) {
   validatePresenceOf(name);
 }, 'Name cannot be blank')
+EventSchema.path('location.coordinates').validate(function (coordinates) {
+  validatePresenceOf(coordinates);
+}, 'Coordinates cannot be blank')
 
-EventSchema.path('location').validate(function (location) {
-  
-  return location&&(location.length>1);
-}, 'Location must be provided')
+
 
 
 mongoose.model('Event', EventSchema)

@@ -10,7 +10,7 @@ describe('event controller', function() {
 	});
 	var minimum_model = {
 		name: "My New Event",
-		location: [-41.154469, 175.011968],
+		location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 		address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 		start_date: "2013-01-01T19:00:00",
 		end_date: "2013-01-02T00:00:00"
@@ -46,13 +46,15 @@ describe('event controller', function() {
 			should.exist(_result.id);
 		});
 		it('should return the correct event', function() {
+			console.log(_result);
 			_result.name.should.equal(minimum_model.name);
 		});
 		it('should save the correct details', function(done) {
 			Event.findById(_result.id, function(err, ev) {
+				console.log(ev);
 				ev.name.should.equal(minimum_model.name);
-				ev.location[0].should.eql(minimum_model.location[0]);
-				ev.location[1].should.eql(minimum_model.location[1]);
+				ev.location.coordinates[0].should.eql(minimum_model.location.coordinates[0]);
+				ev.location.coordinates[1].should.eql(minimum_model.location.coordinates[1]);
 				should.exist(ev.creation_date_utc);
 				ev.is_public.should.be.false;
 				should.exist(ev.code);
@@ -105,7 +107,8 @@ describe('event controller', function() {
 			_status_code.should.equal(400);
 		});
 		it('should return an error on location', function() {
-			_result.errors.location.type.should.equal('required');
+			console.log(_result.errors);
+			_result.errors['location.coordinates'].type.should.equal('required');
 		});
 		after(function(done) {
 			minimum_model.location = _location;
@@ -145,7 +148,7 @@ describe('event controller', function() {
 		it('should return an error status code', function() {
 			_status_code.should.equal(400);
 		});
-		it('should return an error on location', function() {
+		it('should return an error on name', function() {
 
 			_result.errors.name.type.should.equal('required');
 		});
@@ -187,7 +190,7 @@ describe('event controller', function() {
 		it('should return an error status code', function() {
 			_status_code.should.equal(400);
 		});
-		it('should return an error on location', function() {
+		it('should return an error on start date', function() {
 
 			_result.errors.start_date.type.should.equal('required');
 		});
@@ -229,7 +232,7 @@ describe('event controller', function() {
 		it('should return an error status code', function() {
 			_status_code.should.equal(400);
 		});
-		it('should return an error on location', function() {
+		it('should return an error on end date', function() {
 
 			_result.errors.end_date.type.should.equal('required');
 		});

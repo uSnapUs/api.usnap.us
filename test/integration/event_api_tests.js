@@ -33,7 +33,7 @@ describe('event api', function() {
 				.auth(registered_device.guid, registered_device.token)
 				.send({
 				name: "My New Event",
-				location: [-41.154469, 175.011968],
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 				start_date: "2013-01-01T19:00:00",
 				end_date: "2013-01-02T00:00:00"
@@ -65,7 +65,7 @@ describe('event api', function() {
 				.set('Content-Type', 'application/json')
 				.send({
 				name: "My New Event",
-				location: [-41.154469, 175.011968],
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 				start_date: "2013-01-01T19:00:00",
 				end_date: "2013-01-02T00:00:00"
@@ -95,7 +95,7 @@ describe('event api', function() {
 		before(function(done) {
 			ev = new Event({
 				name: "My New Event",
-				location: [-41.154469, 175.011968],
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 				start_date: "2013-01-01T19:00:00",
 				end_date: "2013-01-02T00:00:00"
@@ -107,7 +107,7 @@ describe('event api', function() {
 					.auth(registered_device.guid, registered_device.token)
 					.send({
 					name: "My New Event",
-					location: [-41.154469, 175.011968],
+					location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 					address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 					start_date: "2013-01-01T19:00:00",
 					end_date: "2013-01-02T00:00:00"
@@ -140,7 +140,7 @@ describe('event api', function() {
 				.auth(registered_device.guid, registered_device.token)
 				.send({
 				name: "My New Event",
-				location: [-41.154469, 175.011968],
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 				start_date: "2013-01-01T19:00:00",
 				end_date: "2013-01-02T00:00:00"
@@ -164,7 +164,7 @@ describe('event api', function() {
 		before(function(done) {
 			ev = new Event({
 				name: "My New Event",
-				location: [-41.154469, 175.011968],
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 				start_date: "2013-01-01T19:00:00",
 				end_date: "2013-01-02T00:00:00"
@@ -176,7 +176,7 @@ describe('event api', function() {
 					.auth(registered_device.guid, 'token')
 					.send({
 					name: "My New Event",
-					location: [-41.154469, 175.011968],
+					location: {type:'Point',coordinates:[-41.154469, 175.011968]},
 					address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 					start_date: "2013-01-01T19:00:00",
 					end_date: "2013-01-02T00:00:00"
@@ -188,6 +188,60 @@ describe('event api', function() {
 			});
 
 		});
+		it('should return an unauthorised status', function() {
+			result.statusCode.should.equal(401);
+		});
+		after(function(done) {
+			Event.remove({}, function() {
+				done();
+			});
+		});
+	});
+	describe('get event near to location, unauthorised', function() {
+		var events_saved;
+		/*
+		before(function(done) {
+			events_saved = [{
+				name: "My New Event",
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
+				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+				start_date: "2013-01-01T19:00:00",
+				end_date: "2013-01-02T00:00:00"
+			},
+			{
+				name: "My New Event",
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
+				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+				start_date: "2013-01-01T19:00:00",
+				end_date: "2013-01-02T00:00:00"
+			},
+			{
+				name: "My New Event",
+				location: {type:'Point',coordinates:[-41.154469, 175.011968]},
+				address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+				start_date: "2013-01-01T19:00:00",
+				end_date: "2013-01-02T00:00:00"
+			}];
+
+			Event.create(events_saved,function() {
+				request(http.createServer(app))
+					.get('/event/' + ev.code)
+					.set('Content-Type', 'application/json')
+					.auth(registered_device.guid, 'token')
+					.send({
+					name: "My New Event",
+					location: {type:'Point',coordinates:[-41.154469, 175.011968]},
+					address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
+					start_date: "2013-01-01T19:00:00",
+					end_date: "2013-01-02T00:00:00"
+				})
+					.end(function(err, res) {
+					result = res;
+					done();
+				});
+			});
+
+		});*/
 		it('should return an unauthorised status', function() {
 			result.statusCode.should.equal(401);
 		});

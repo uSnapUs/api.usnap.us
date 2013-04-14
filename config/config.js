@@ -4,7 +4,7 @@ module.exports = {
       app: {
         name: 'usnap.us'
       },
-      db: 'mongodb://localhost/noobjs_dev',
+      db: 'mongodb://localhost/usnap_us_dev',
       aws:{
         key:'AKIAI2DV2LLOMN3ANUDA',
         secret:'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',
@@ -15,7 +15,7 @@ module.exports = {
      app: {
         name: 'usnap.us'
       },
-      db: 'mongodb://localhost/noobjs_test',
+      db: 'mongodb://localhost/usnap_us_test',
       aws:{
         key:'AKIAJ2HIO2X2PG5ZTMRA',
         secret:'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',
