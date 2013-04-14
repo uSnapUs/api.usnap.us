@@ -38,11 +38,12 @@ desc('Loads in properties file');
 task('load-props', ["install-npm-depends"], function() {
 
 	console.log("\n\n > Attempting to read in build properties\n".blue);
-	
+	var branch = process.env.branch||"master";
+	console.log(branch);
 	var fs = require("fs");
 	
 	// Read in and parse build properties
-	properties = JSON.parse(fs.readFileSync('config/props.json'));
+	properties = JSON.parse(fs.readFileSync('config/'+branch+'.props.json'));
 	
 	// Print the properties to the console
 	for (var p in properties) {
@@ -138,7 +139,7 @@ task('symlink-live', ["load-props", "create-versioned-dir", "move-files"], funct
 
 desc('Puts the site live');
 task('default', ["load-props", "create-versioned-dir", "move-files", "symlink-live"], function() {
-
+    
 	console.log("\n\n > Attempting to put the site live\n".blue);
 
 	var exec = require('child_process').exec,
