@@ -20,7 +20,7 @@ module.exports = {
       }
     }
   , stage: {
-    db: 'monogodb://localhost/api_usnap_us_stage',
+    db: 'mongodb://localhost/api_usnap_us_stage',
     aws:{
        key:'AKIAJ2HIO2X2PG5ZTMRA',
        secret:'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',
