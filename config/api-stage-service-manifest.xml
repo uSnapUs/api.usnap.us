@@ -20,6 +20,7 @@
       <method_environment>
         <envvar name="PATH" value="/home/admin/local/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin"/>
         <envvar name="HOME" value="/home/admin"/>
+        <envvar name="NODE_ENV" value="stage"/>
       </method_environment>
     </method_context>
 

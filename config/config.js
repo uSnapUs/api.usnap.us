@@ -19,6 +19,14 @@ module.exports = {
         bucket:'api.usnap.us.test'
       }
     }
+  , stage: {
+    db: 'monogodb://localhost/api_usnap_us_stage',
+    aws:{
+       key:'AKIAJ2HIO2X2PG5ZTMRA',
+       secret:'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',
+       bucket:'api.usnap.us.test'
+    }
+  }
   , production: {
      root: require('path').normalize(__dirname + '/..'),
      app: {
