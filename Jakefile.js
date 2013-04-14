@@ -122,8 +122,8 @@ task('symlink-live', ["load-props", "create-versioned-dir", "move-files"], funct
 		console.log(error1);
 		console.log(stderr1);
 		ln = exec("ln -sv " + versionedPath + " " + livePath, function (error, stdout, stderr) {
-			if (error !== null && error.message.indexOf("No such file or directory") === -1) {
-				console.log(error.message);
+			if (error !== null) {
+				console.log(error);
 				throw error;
 			} else {
 				console.log("\n + Symlink created".green);
