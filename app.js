@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 
+
+
 var express = require('express'),
   routes = require('./routes'),
 
@@ -26,7 +28,7 @@ var express = require('express'),
   })
 
   var app = express();
-
+  
   require('./config/express')(app, config, passport)
   require('./config/routes')(app, passport, auth)
 

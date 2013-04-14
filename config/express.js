@@ -2,14 +2,17 @@
  * Module dependencies.
  */
 
+
+
 var express = require('express'),
   mongoStore = require('connect-mongo')(express),
   flash = require('connect-flash'),
-  helpers = require('view-helpers')
+  helpers = require('view-helpers');
+  //airbrake = require('airbrake').createClient("your api key");
 
   module.exports = function(app, config, passport) {
-
-    app.set('showStackError', true)
+   // app.error(airbrake.expressHandler());
+    app.set('showStackError', true);
     // should be placed before express.static
     app.use(express.compress({
       filter: function(req, res) {

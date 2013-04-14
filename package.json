@@ -19,7 +19,8 @@
     "passport-http": "*",
     "moment": "*",
     "knox":"*",
-    "imagemagick":"*"
+    "imagemagick":"*",
+    "nodefly":"*"
   },
   "devDependencies":{
     "should": "*",
