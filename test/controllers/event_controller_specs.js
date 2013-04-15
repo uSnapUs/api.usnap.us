@@ -10,7 +10,7 @@ describe('event controller', function() {
 	});
 	var minimum_model = {
 		name: "My New Event",
-		location: {type:'Point',coordinates:[-41.154469, 175.011968]},
+		location: {type:'Point',coordinates:[175.011968,-41.154469]},
 		address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 		start_date: "2013-01-01T19:00:00",
 		end_date: "2013-01-02T00:00:00"
@@ -46,12 +46,10 @@ describe('event controller', function() {
 			should.exist(_result.id);
 		});
 		it('should return the correct event', function() {
-			console.log(_result);
 			_result.name.should.equal(minimum_model.name);
 		});
 		it('should save the correct details', function(done) {
 			Event.findById(_result.id, function(err, ev) {
-				console.log(ev);
 				ev.name.should.equal(minimum_model.name);
 				ev.location.coordinates[0].should.eql(minimum_model.location.coordinates[0]);
 				ev.location.coordinates[1].should.eql(minimum_model.location.coordinates[1]);
@@ -107,7 +105,6 @@ describe('event controller', function() {
 			_status_code.should.equal(400);
 		});
 		it('should return an error on location', function() {
-			console.log(_result.errors);
 			_result.errors['location.coordinates'].type.should.equal('required');
 		});
 		after(function(done) {

@@ -10,6 +10,8 @@ var mongoose = require('mongoose')
   , authTypes = ['basic']
   , moment = require('moment');
 
+
+
 /**
 * Photo Schema
 */
@@ -33,8 +35,10 @@ var EventSchema = new Schema({
   is_public:{type:Boolean,required:true,default:false},
   photos:[PhotoSchema]
 });
-EventSchema.index({location:'2dsphere'});
+EventSchema.set('autoIndex', true);
+PhotoSchema.set('autoIndex', true);
 EventSchema.path('location.coordinates').required(true);
+EventSchema = EventSchema.index({location:'2dsphere'});
 
 EventSchema.pre('save', function(next) {
   if (!this.isNew) return next();

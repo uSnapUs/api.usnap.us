@@ -19,8 +19,8 @@ var DeviceSchema = new Schema({
   facebook_id:String,
   hashed_token: String,
   salt: String,
-})
-
+});
+DeviceSchema.set('autoIndex', true);
 /**
  * Virtuals
  */

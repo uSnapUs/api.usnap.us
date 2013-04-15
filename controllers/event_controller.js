@@ -4,13 +4,20 @@
 var mongoose = require('mongoose');
 var Event = mongoose.model('Event');
 var photo_controller = require('../controllers/photo_controller');
-exports.setupRoutes = function(app,passport,auth){
-  app.post('/events', passport.authenticate('basic', { session: false }),this.create);
-  app.post('/event/:event_code/photos',photo_controller.create);
-  app.get('/event/:event_code',passport.authenticate('basic',{session:false}),this.get);
+exports.setupRoutes = function(app, passport, auth) {
+  app.post('/events', passport.authenticate('basic', {
+    session: false
+  }), this.create);
+  app.post('/event/:event_code/photos', photo_controller.create);
+  app.get('/event/:event_code', passport.authenticate('basic', {
+    session: false
+  }), this.get);
+  app.get('/events/by_location', passport.authenticate('basic', {
+    session: false
+  }), this.getByLocation);
 };
 exports.create = function(req, res) {
-  
+
   var ev = new Event(req.body);
   Event.findOne({
     id: ev.id
@@ -33,8 +40,8 @@ exports.create = function(req, res) {
 
   return;
 };
-exports.get = function(req,res){
-   Event.findOne({
+exports.get = function(req, res) {
+  Event.findOne({
     code: req.params.event_code
   }, function(err, existing_event) {
 
@@ -54,5 +61,30 @@ exports.get = function(req,res){
 
   });
 
+  return;
+};
+exports.getByLocation = function(req, res) {
+  var point = {
+          type: 'Point',
+          coordinates: [parseFloat(req.query.longitude), parseFloat(req.query.latitude)]
+        };
+  Event.find({
+    location: {
+      $near: {
+        $geometry: point,
+        $maxDistance: 2000
+      }
+    }
+  }, function(err, docs) {
+    if (err) {
+      res.status(500);
+      res.send(err);
+      return;
+    } else {
+      res.status(200);
+      res.send(docs);
+      return;
+    }
+  });
   return;
 };

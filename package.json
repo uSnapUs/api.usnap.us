@@ -9,7 +9,7 @@
     "express": "3.1.0",
     "jade": "*",
     "stylus": "*",
-    "mongoose": "3.5.7",
+    "mongoose": "*",
     "connect-mongo":"*",
     "connect-flash":"*",
     "view-helpers":"*",
