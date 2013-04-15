@@ -4,7 +4,10 @@
 var mongoose = require('mongoose');
 var Event = mongoose.model('Event');
 var photo_controller = require('../controllers/photo_controller');
-exports.setupRoutes = function(app, passport, auth) {
+var SendGrid = require('sendgrid').SendGrid;
+var sendgrid;
+exports.setupRoutes = function(app, passport, auth, config) {
+  sendgrid = new SendGrid(config.email_user, config.email_key);
   app.post('/events', passport.authenticate('basic', {
     session: false
   }), this.create);
@@ -30,6 +33,20 @@ exports.create = function(req, res) {
     }
     existing_event.save(function(err, saved_event) {
       if (!err) {
+        if (req.user && req.user.email) {
+          console.log('sending email');
+          sendgrid.send({
+            to: req.user.email,
+            from: "events@app.usnap.us",
+            subject: 'New Event Created',
+            text: JSON.stringify(saved_event.toJSON()),
+          }, function(success, message) {
+            if (!success) {
+              console.log(message);
+
+            }
+          });
+        }       
         res.send(saved_event);
       } else {
         res.status(400);
@@ -65,9 +82,9 @@ exports.get = function(req, res) {
 };
 exports.getByLocation = function(req, res) {
   var point = {
-          type: 'Point',
-          coordinates: [parseFloat(req.query.longitude), parseFloat(req.query.latitude)]
-        };
+    type: 'Point',
+    coordinates: [parseFloat(req.query.longitude), parseFloat(req.query.latitude)]
+  };
   Event.find({
     location: {
       $near: {

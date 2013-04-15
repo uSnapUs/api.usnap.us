@@ -20,13 +20,16 @@
     "moment": "*",
     "knox":"*",
     "imagemagick":"*",
-    "nodefly":"*"
+    "nodefly":"*",
+    "sendgrid":"*"
   },
   "devDependencies":{
     "should": "*",
     "sinon": "*",
     "mocha":"*",
     "zombie":"*",
-    "supertest":"*"
+    "supertest":"*",
+    "nock":"*",
+    "querystring":"*"
   }
 }

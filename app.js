@@ -5,7 +5,6 @@
 
 
 var express = require('express'),
-  routes = require('./routes'),
 
   path = require('path'),
   fs = require('fs'),
@@ -32,7 +31,7 @@ var express = require('express'),
   var app = express();
   
   require('./config/express')(app, config, passport)
-  require('./config/routes')(app, passport, auth)
+  require('./config/routes')(app, passport, auth,config)
 
   var Device = mongoose.model('Device');
 

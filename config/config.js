@@ -4,6 +4,8 @@ module.exports = {
       app: {
         name: 'usnap.us'
       },
+      email_user:'',
+      email_key:'',
       db: 'mongodb://localhost/usnap_us_dev',
       aws:{
         key:'AKIAI2DV2LLOMN3ANUDA',
@@ -15,6 +17,8 @@ module.exports = {
      app: {
         name: 'usnap.us'
       },
+      email_user:'',
+      email_key:'',
       db: 'mongodb://localhost/usnap_us_test',
       aws:{
         key:'AKIAJ2HIO2X2PG5ZTMRA',
@@ -27,6 +31,8 @@ module.exports = {
      app: {
         name: 'usnap.us'
       },
+      email_user:'usnapus',
+      email_key:'2oWo%#[66/4+Hm9)3G4k',
     aws:{
        key:'AKIAJ2HIO2X2PG5ZTMRA',
        secret:'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',
@@ -35,6 +41,8 @@ module.exports = {
   }
   , production: {
      root: require('path').normalize(__dirname + '/..'),
+     email_user:'usnapus',
+      email_key:'2oWo%#[66/4+Hm9)3G4k',
      app: {
         name: 'usnap.us'
       },

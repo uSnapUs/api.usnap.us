@@ -54,6 +54,13 @@ describe('photo api', function() {
 				done();
 			});
 		});
+		it('should save id for thumbnail and full image',function(done){
+			Event.findById(registered_event.id, function(err, ev) {
+				should.exist(ev.photos[0].thumbnail_url);
+				should.exist(ev.photos[0].full_url)
+				done();
+			});
+		});
 		after(function(done) {
 			registered_event.photos = [];
 			registered_event.save(function() {
