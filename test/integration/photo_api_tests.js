@@ -61,6 +61,20 @@ describe('photo api', function() {
 				done();
 			});
 		});
+		it('should save the correct extension for thumbnail image',function(done){
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].thumbnail_url.should.include('.png');
+				done();
+			});
+		});
+		it('should save the correct root url',function(done){
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].root_url.should.equal('https://s3.amazonaws.com/api.usnap.us.test')
+				done();
+			});
+		});
+
+
 		after(function(done) {
 			registered_event.photos = [];
 			registered_event.save(function() {

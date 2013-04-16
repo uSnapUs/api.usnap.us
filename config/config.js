@@ -49,7 +49,8 @@ module.exports = {
       db: 'mongodb://usnap_us_app:QxFFvTrEtcVXCWLgko9XrBi7xFPWhGzTuurq@dharma.mongohq.com:10005/usnap_us',
       aws:{
           key:process.env.S3_KEY,
-          secret:process.env.S3_SECRET
+          secret:process.env.S3_SECRET,
+          bucket:''
       }
     }
 }

@@ -21,7 +21,8 @@
     "knox":"*",
     "imagemagick":"*",
     "nodefly":"*",
-    "sendgrid":"*"
+    "sendgrid":"*",
+    "winston":"*"
   },
   "devDependencies":{
     "should": "*",

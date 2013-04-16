@@ -18,6 +18,9 @@ var mongoose = require('mongoose')
 var PhotoSchema = new Schema({
   creation_date_utc:{type:Date,default:moment.utc(),required:true},
   likes:{type:Number,default:0},
+  thumbnail_url:{type:String},
+  full_url:{type:String},
+  root_url:{type:String}
 });
 
 /**
@@ -77,3 +80,4 @@ EventSchema.path('location.coordinates').validate(function (coordinates) {
 
 
 mongoose.model('Event', EventSchema)
+mongoose.model('Photo',PhotoSchema)

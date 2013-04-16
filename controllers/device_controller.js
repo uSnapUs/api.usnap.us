@@ -4,6 +4,11 @@
 var mongoose = require('mongoose');
 var passport = require('passport');
 
+exports.setupRoutes = function(app, passport, auth, config) {
+  app.post('/devices', this.create);
+  app.delete('/devices', this.delete);
+};
+
 exports.create = function(req, res, next) {
   passport.authenticate('basic', function(auth_err, usr, info) {
     var Device = mongoose.model('Device');

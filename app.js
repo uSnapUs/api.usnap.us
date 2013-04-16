@@ -9,6 +9,7 @@ var express = require('express'),
   path = require('path'),
   fs = require('fs'),
   passport = require("passport"),
+  winston = require('winston'),
   BasicStrategy = require('passport-http').BasicStrategy;
 // Load configurations
 (function() {
@@ -16,6 +17,8 @@ var express = require('express'),
     config = require('./config/config')[env],
     mongoose = require('mongoose'),
     auth = require('./config/middleware/authorisation');
+
+  winston.add(winston.transports.File, { filename: 'default.log' });
 
   //mongoose.set('debug', true);
 

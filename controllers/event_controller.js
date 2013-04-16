@@ -3,7 +3,6 @@
  */
 var mongoose = require('mongoose');
 var Event = mongoose.model('Event');
-var photo_controller = require('../controllers/photo_controller');
 var SendGrid = require('sendgrid').SendGrid;
 var sendgrid;
 exports.setupRoutes = function(app, passport, auth, config) {
@@ -11,7 +10,6 @@ exports.setupRoutes = function(app, passport, auth, config) {
   app.post('/events', passport.authenticate('basic', {
     session: false
   }), this.create);
-  app.post('/event/:event_code/photos', photo_controller.create);
   app.get('/event/:event_code', passport.authenticate('basic', {
     session: false
   }), this.get);

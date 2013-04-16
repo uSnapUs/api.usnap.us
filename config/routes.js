@@ -19,7 +19,8 @@ module.exports = function (app, passport, auth,config) {
         
 			});
     });
-   app.post('/devices',device_controller.create);
+ 
    event_controller.setupRoutes(app,passport,auth,config);
-   app.delete('/devices',device_controller.delete);
+   photo_controller.setupRoutes(app,passport,auth,config);
+   device_controller.setupRoutes(app,passport,auth,config);
 }
