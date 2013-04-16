@@ -19,7 +19,7 @@ exports.create = function(req, res, next) {
           res.send("unauthorised to update this device");
           return;
         }
-
+        existing_device.email = device.email;
         existing_device.name = device.name;
         existing_device.facebook_id = device.facebook_id;
       }
