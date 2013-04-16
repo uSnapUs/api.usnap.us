@@ -8,7 +8,7 @@ task('install-npm-depends', [], function () {
 	
 	console.log("    Executing command:\n    $ npm install\n".grey);
 
-	npm = spawn("npm", ["install"]);
+	npm = spawn("npm", ["install","--production"]);
 	
 	npm.stdout.on('data', function (data) {
 		process.stdout.write(("    " + data).grey);
