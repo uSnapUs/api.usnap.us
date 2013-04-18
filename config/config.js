@@ -48,9 +48,9 @@ module.exports = {
       },
       db: 'mongodb://usnap_us_app:QxFFvTrEtcVXCWLgko9XrBi7xFPWhGzTuurq@dharma.mongohq.com:10005/usnap_us',
       aws:{
-          key:process.env.S3_KEY,
-          secret:process.env.S3_SECRET,
-          bucket:''
+          key:'AKIAJ2HIO2X2PG5ZTMRA',
+       secret:'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',
+       bucket:'api.usnap.us.test'
       }
     }
 }
