@@ -25,7 +25,10 @@ exports.create = function(req, res) {
   Event.findOne({
     code: req.params.event_code
   }, function(err, existing_event) {
-
+    if(req.files.file&&!req.files.photo)
+    {
+      req.files.photo = req.files.file;
+    }
     if (err) {
       res.status(400);
       res.send(err);
