@@ -91,7 +91,7 @@ exports.create = function(req, res) {
                   }, function(err, res) {
                     fs.unlink(req.files.photo.path + "_thumbnail.png");
                     fs.unlink(req.files.photo.path + "_full.png");
-                    fs.unlink(req.files.photo.path;
+                    fs.unlink(req.files.photo.path);
 
                     });
 
