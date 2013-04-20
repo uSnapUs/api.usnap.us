@@ -107,7 +107,7 @@ exports.create = function(req, res) {
           existing_event.photos.push(photo);
           existing_event.save(function(err, saved_event) {
             if (!err) {
-              res.send(saved_event);
+              res.send(photo);
             } else {
               res.status(400);
               res.send(err);
