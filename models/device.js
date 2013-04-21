@@ -8,6 +8,7 @@ var mongoose = require('mongoose')
   , crypto = require('crypto')
   , _ = require('underscore')
   , authTypes = ['basic']
+  ,timestamps = require('mongoose-timestamp');
 /**
  * Device Schema
  */
@@ -20,6 +21,7 @@ var DeviceSchema = new Schema({
   hashed_token: String,
   salt: String,
 });
+DeviceSchema.plugin(timestamps);
 DeviceSchema.set('autoIndex', true);
 /**
  * Virtuals

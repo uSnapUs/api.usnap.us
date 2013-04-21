@@ -40,8 +40,12 @@ exports.list = function(req,res){
       if(req.query.since)
       {
         var since_moment = moment(req.query.since);
+        
+
         photos = _.filter(existing_event.photos,function(photo){
-          return photo.creation_date_utc>=since_moment;
+          var creationDate = moment(photo.creation_time.getTime());
+         
+          return creationDate.diff(since_moment)>=0;
         });
       }
       res.status(200);

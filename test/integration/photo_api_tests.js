@@ -177,14 +177,14 @@ describe('photo api', function() {
 							ev2.photos.push(existing_photo2);
 							ev2.save(function() {
 								request(http.createServer(app))
-									.get('/event/' + registered_event.code + '/photos?since=' + encodeURIComponent(request_time.format('YYYY-MM-DDTHH:mm:ss Z')))
+									.get('/event/' + registered_event.code + '/photos?since=' + encodeURIComponent(request_time.format('YYYY-MM-DDTHH:mm:ss.SSS Z')))
 									.auth(registered_device.guid, registered_device.token)
 									.end(function(err, res) {
 									result = res;
 									done();
 								});
 							});
-						},1000);
+						},200);
 					});
 				});
 			});

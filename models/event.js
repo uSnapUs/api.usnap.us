@@ -8,7 +8,8 @@ var mongoose = require('mongoose')
   , crypto = require('crypto')
   , _ = require('underscore')
   , authTypes = ['basic']
-  , moment = require('moment');
+  , moment = require('moment')
+  ,timestamps = require('mongoose-timestamp');
 
 
 
@@ -16,11 +17,11 @@ var mongoose = require('mongoose')
 * Photo Schema
 */
 var PhotoSchema = new Schema({
-  creation_date_utc:{type:Date,default:moment.utc,required:true},
   likes:{type:Number,default:0},
   thumbnail_url:{type:String},
   full_url:{type:String},
-  root_url:{type:String}
+  root_url:{type:String},
+  creation_time:{type:Date,default:Date.now}
 });
 
 /**
@@ -29,7 +30,6 @@ var PhotoSchema = new Schema({
 
 var EventSchema = new Schema({
   name: {type:String,required:true},
-  creation_date_utc:{type:Date,default:moment.utc,required:true},
   location:{type:{type:String},coordinates:[]},
   address:{type:String},
   start_date:{type:Date,required:true},
@@ -38,6 +38,8 @@ var EventSchema = new Schema({
   is_public:{type:Boolean,required:true,default:false},
   photos:[PhotoSchema]
 });
+EventSchema.plugin(timestamps);
+PhotoSchema.plugin(timestamps);
 EventSchema.set('autoIndex', true);
 PhotoSchema.set('autoIndex', true);
 EventSchema.path('location.coordinates').required(true);

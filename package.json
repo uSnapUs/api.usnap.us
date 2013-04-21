@@ -22,7 +22,8 @@
     "imagemagick":"*",
     "nodefly":"*",
     "sendgrid":"*",
-    "winston":"*"
+    "winston":"*",
+    "mongoose-timestamp":"*"
   },
   "devDependencies":{
     "should": "*",

@@ -53,7 +53,7 @@ describe('event controller', function() {
 				ev.name.should.equal(minimum_model.name);
 				ev.location.coordinates[0].should.eql(minimum_model.location.coordinates[0]);
 				ev.location.coordinates[1].should.eql(minimum_model.location.coordinates[1]);
-				should.exist(ev.creation_date_utc);
+				should.exist(ev.createdAt);
 				ev.is_public.should.be.false;
 				should.exist(ev.code);
 				_result.code.should.equal(ev.code);
