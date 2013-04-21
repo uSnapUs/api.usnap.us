@@ -45,7 +45,7 @@ exports.list = function(req,res){
         photos = _.filter(existing_event.photos,function(photo){
           var creationDate = moment(photo.creation_time.getTime());
          
-          return creationDate.diff(since_moment)>=0;
+          return creationDate.diff(since_moment)>0;
         });
       }
       res.status(200);
