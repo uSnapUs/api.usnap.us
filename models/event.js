@@ -16,7 +16,7 @@ var mongoose = require('mongoose')
 * Photo Schema
 */
 var PhotoSchema = new Schema({
-  creation_date_utc:{type:Date,default:moment.utc(),required:true},
+  creation_date_utc:{type:Date,default:moment.utc,required:true},
   likes:{type:Number,default:0},
   thumbnail_url:{type:String},
   full_url:{type:String},
@@ -29,7 +29,7 @@ var PhotoSchema = new Schema({
 
 var EventSchema = new Schema({
   name: {type:String,required:true},
-  creation_date_utc:{type:Date,default:moment.utc(),required:true},
+  creation_date_utc:{type:Date,default:moment.utc,required:true},
   location:{type:{type:String},coordinates:[]},
   address:{type:String},
   start_date:{type:Date,required:true},

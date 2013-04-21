@@ -8,7 +8,8 @@ var mongoose = require('mongoose'),
   crypto = require('crypto'),
   knox = require('knox'),
   winston = require('winston'),
-  fs = require('fs');
+  fs = require('fs'),
+  moment = require('moment');
 
 var _s3Client;
 
@@ -20,8 +21,34 @@ exports.setupRoutes = function(app, passport, auth, config) {
     bucket: config.aws.bucket
   });
   app.post('/event/:event_code/photos', this.create);
+  app.get('/event/:event_code/photos',this.list);
 };
-
+exports.list = function(req,res){
+  Event.findOne({
+    code: req.params.event_code
+  }, function(err, existing_event) {
+     if (err) {
+      res.status(400);
+      res.send(err);
+      return;
+    } else if (!existing_event) {
+      res.status(404);
+      res.send();
+      return;
+    } else {
+      var photos = existing_event.photos;
+      if(req.query.since)
+      {
+        var since_moment = moment(req.query.since);
+        photos = _.filter(existing_event.photos,function(photo){
+          return photo.creation_date_utc>=since_moment;
+        });
+      }
+      res.status(200);
+      res.send(photos);
+    }
+  });
+}
 exports.create = function(req, res) {
   Event.findOne({
     code: req.params.event_code
@@ -29,7 +56,6 @@ exports.create = function(req, res) {
     if (req.files.file && !req.files.photo) {
       req.files.photo = req.files.file;
     }
-    console.log(req.files);
     if (err) {
       res.status(400);
       res.send(err);
@@ -103,7 +129,7 @@ exports.create = function(req, res) {
 
             });
 
-
+          
           existing_event.photos.push(photo);
           existing_event.save(function(err, saved_event) {
             if (!err) {
