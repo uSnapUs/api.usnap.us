@@ -23,7 +23,9 @@
     "nodefly":"*",
     "sendgrid":"*",
     "winston":"*",
-    "mongoose-timestamp":"*"
+    "mongoose-timestamp":"*",
+    "express-winston":"*",
+    "winston-loggly":"*"
   },
   "devDependencies":{
     "should": "*",
