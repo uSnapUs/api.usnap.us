@@ -19,7 +19,7 @@ exports.setupRoutes = function(app, passport, auth, config) {
 };
 exports.create = function(req, res) {
  
-  var ev = new Event();
+  var ev = new Event(req.body);
   Event.findOne({
     id: ev.id
   }, function(err, existing_event) {
