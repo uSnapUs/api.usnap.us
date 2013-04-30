@@ -133,7 +133,10 @@ exports.create = function(req, res) {
 
             });
 
-          
+          if(!existing_event.photos)
+          {
+            existing_event.photos = [];
+          }
           existing_event.photos.push(photo);
           existing_event.save(function(err, saved_event) {
             if (!err) {
