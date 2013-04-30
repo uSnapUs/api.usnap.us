@@ -18,8 +18,7 @@ exports.setupRoutes = function(app, passport, auth, config) {
   }), this.getByLocation);
 };
 exports.create = function(req, res) {
-  if(req.body&&req.body.photos)
-    delete req.body.photos;
+ 
   var ev = new Event();
   Event.findOne({
     id: ev.id
