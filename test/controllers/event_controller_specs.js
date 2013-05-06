@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 require("../../models/event");
+
 var Event = mongoose.model('Event');
+
 var event_controller = require("../../controllers/event_controller");
 var should = require('should');
 
@@ -10,7 +12,10 @@ describe('event controller', function() {
 	});
 	var minimum_model = {
 		name: "My New Event",
-		location: {type:'Point',coordinates:[175.011968,-41.154469]},
+		location: {
+			type: 'Point',
+			coordinates: [175.011968, -41.154469]
+		},
 		address: "36 Sunbrae Drive, Silverstream, Upper Hutt, New Zealand",
 		start_date: "2013-01-01T19:00:00",
 		end_date: "2013-01-02T00:00:00"
@@ -21,20 +26,22 @@ describe('event controller', function() {
 		var _status_code;
 		var _result;
 		before(function(done) {
-			var req = {
-				body: minimum_model
+			Event.remove({}, function() {
+				var req = {
+					body: minimum_model
 
-			};
-			var res = {
-				status: function(status_code) {
-					_status_code = status_code;
-				},
-				send: function(object) {
-					_result = object;
-					done();
-				}
-			};
-			event_controller.create(req, res);
+				};
+				var res = {
+					status: function(status_code) {
+						_status_code = status_code;
+					},
+					send: function(object) {
+						_result = object;
+						done();
+					}
+				};
+				event_controller.create(req, res);
+			});
 		});
 		it('should create a new event', function(done) {
 			Event.count({}, function(err, count) {
@@ -61,10 +68,10 @@ describe('event controller', function() {
 				done();
 			});
 		});
-		it('should mark event as private', function(){
+		it('should mark event as private', function() {
 			_result.is_public.should.be.false;
 		});
-		it('should create an event code', function () {
+		it('should create an event code', function() {
 			should.exist(_result.code);
 		});
 		after(function(done) {
@@ -240,8 +247,8 @@ describe('event controller', function() {
 			})
 		});
 	});
-	describe('#get event by code',function(){
-		
+	describe('#get event by code', function() {
+
 	});
 	after(function(done) {
 		Event.remove({}, function() {

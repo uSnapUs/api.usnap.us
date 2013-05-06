@@ -55,10 +55,7 @@ module.exports = function(app, config, passport) {
     app.use(express.favicon());
     app.use(expressWinston.logger({
       transports: [
-      new winston.transports.Console({
-        json: true,
-        colorize: true
-      }),
+     
 
       new winston.transports.Loggly({
         json:true,

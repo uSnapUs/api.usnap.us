@@ -12,7 +12,10 @@ exports.setupRoutes = function(app, passport, auth, config) {
 exports.create = function(req, res, next) {
   passport.authenticate('basic', function(auth_err, usr, info) {
     var Device = mongoose.model('Device');
+    var User = mongoose.model('User');
     var device = new Device(req.body);
+
+
     Device.findOne({
       guid: device.guid
     }, function(err, existing_device) {
@@ -26,15 +29,35 @@ exports.create = function(req, res, next) {
         }
         existing_device.email = device.email;
         existing_device.name = device.name;
-        existing_device.facebook_id = device.facebook_id;
+      }
+      var user = new User();
+      if (req.body.user && req.body.user.facebook_id) {
+        user = new User(req.body.user);        
+        User.findOne({
+          facebook_id: user.facebook_id
+        }, function(err, existing_user) {
+          if (!err && existing_user) {
+            user = existing_user;
+          }
+        });
+        existing_device.user = user;
+
       }
       existing_device.save(function(err, saved_device) {
         if (!err) {
-          res.send(saved_device);
+          user.save(function(err, saved_user) {
+            if (!err) {
+              res.send(saved_device);
+            } else {
+              res.status(400);
+              res.send(err);
+            }
+          });
         } else {
           res.status(400);
           res.send(err);
         }
+
       });
     });
   })(req, res, next);

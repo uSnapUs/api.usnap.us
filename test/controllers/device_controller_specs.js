@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
+var db = mongoose.createConnection();
 require("../../models/device");
 var Device = mongoose.model('Device');
+var User = mongoose.model('User');
 var device_controller = require("../../controllers/device_controller");
 var should = require('should');
 var passport = require("passport"),
@@ -8,6 +10,7 @@ var passport = require("passport"),
 describe('DeviceController', function() {
 	before(function() {
 		mongoose.connect(config.db);
+
 	});
 	describe('register with a new device (minimum fields)', function() {
 		var _posted_model = {
@@ -17,20 +20,25 @@ describe('DeviceController', function() {
 		var _result;
 		var _status_code;
 		before(function(done) {
-			var req = {
-				body: _posted_model,
-				headers: []
-			};
-			var res = {
-				status: function(status_code) {
-					_status_code = status_code;
-				},
-				send: function(object) {
-					_result = object;
-					done();
-				}
-			};
-			device_controller.create(req, res, function() {});
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					var req = {
+						body: _posted_model,
+						headers: []
+					};
+					var res = {
+						status: function(status_code) {
+							_status_code = status_code;
+						},
+						send: function(object) {
+							_result = object;
+							done();
+						}
+					};
+					device_controller.create(req, res, function() {});
+				});
+			});
+
 		});
 		it("should create a new device", function(done) {
 			Device.count({}, function(err, count) {
@@ -70,8 +78,10 @@ describe('DeviceController', function() {
 			_result.token.should.exist;
 		});
 		after(function(done) {
-			Device.remove({}, function() {
-				done();
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					done();
+				});
 			});
 		});
 	});
@@ -80,27 +90,36 @@ describe('DeviceController', function() {
 		var _posted_model = {
 			guid: 'guid',
 			name: 'name',
-			facebook_id: 'facebook_id'
+			user: {
+				facebook_id: 'facebook_id',
+				email: 'user@user.com',
+				name: 'user'
+			}
+
 		};
 		var _result;
 		var _status_code;
 		before(function(done) {
-			var req = {
-				body: _posted_model,
-				headers: []
-			};
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					var req = {
+						body: _posted_model,
+						headers: []
+					};
 
 
-			var res = {
-				status: function(status_code) {
-					_status_code = status_code;
-				},
-				send: function(object) {
-					_result = object;
-					done();
-				}
-			};
-			device_controller.create(req, res);
+					var res = {
+						status: function(status_code) {
+							_status_code = status_code;
+						},
+						send: function(object) {
+							_result = object;
+							done();
+						}
+					};
+					device_controller.create(req, res);
+				});
+			});
 		});
 		it("should create a new device", function(done) {
 			Device.count({}, function(err, count) {
@@ -117,13 +136,17 @@ describe('DeviceController', function() {
 				done();
 			});
 		})
-		it('should save all the fields', function(done) {
+		it('should save the correct name', function(done) {
 			Device.findOne({
 				guid: _posted_model.guid
 			}, function(err, saved) {
-				saved.guid.should.equal(_posted_model.guid);
 				saved.name.should.equal(_posted_model.name);
-				saved.facebook_id.should.equal(_posted_model.facebook_id);
+				done();
+			});
+		});
+		it('should save a user', function(done) {
+			User.count({}, function(err, count) {
+				count.should.equal(1);
 				done();
 			});
 		});
@@ -134,7 +157,6 @@ describe('DeviceController', function() {
 				_result.guid.should.equal(saved.guid);
 				_result.id.should.equal(saved.id);
 				_result.name.should.equal(saved.name);
-				_result.facebook_id.should.equal(saved.facebook_id);
 				done();
 			});
 		});
@@ -142,8 +164,10 @@ describe('DeviceController', function() {
 			_result.token.should.exist;
 		});
 		after(function(done) {
-			Device.remove({}, function() {
-				done();
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					done();
+				});
 			});
 		});
 	});
@@ -156,27 +180,30 @@ describe('DeviceController', function() {
 		var _result;
 		var _status_code;
 		before(function(done) {
+			User.remove({}, function() {
+				Device.remove({}, function() {
 
+					var existing_device = new Device(_posted_model);
+					existing_device.name = 'existing';
+					existing_device.save(function() {
+						var req = {
+							body: _posted_model,
+							headers: []
+						};
+						req.headers["authorization"] = "Basic " + new Buffer(existing_device.guid + ':' + existing_device.token).toString('base64')
 
-			var existing_device = new Device(_posted_model);
-			existing_device.name = 'existing';
-			existing_device.save(function() {
-				var req = {
-					body: _posted_model,
-					headers: []
-				};
-				req.headers["authorization"] = "Basic " + new Buffer(existing_device.guid + ':' + existing_device.token).toString('base64')
-				
-				var res = {
-					status: function(status_code) {
-						_status_code = status_code;
-					},
-					send: function(object) {
-						_result = object;
-						done();
-					}
-				};
-				device_controller.create(req, res, function() {});
+						var res = {
+							status: function(status_code) {
+								_status_code = status_code;
+							},
+							send: function(object) {
+								_result = object;
+								done();
+							}
+						};
+						device_controller.create(req, res, function() {});
+					});
+				});
 			});
 		});
 		it("should not create a new device", function(done) {
@@ -199,8 +226,10 @@ describe('DeviceController', function() {
 			should.not.exist(_result.token);
 		});
 		after(function(done) {
-			Device.remove({}, function() {
-				done();
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					done();
+				});
 			});
 		});
 	});
@@ -211,22 +240,26 @@ describe('DeviceController', function() {
 		var _result;
 		var _status_code;
 		before(function(done) {
-			var req = {
-				body: _posted_model,
-				headers: []
-			};
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					var req = {
+						body: _posted_model,
+						headers: []
+					};
 
 
-			var res = {
-				status: function(status_code) {
-					_status_code = status_code;
-				},
-				send: function(object) {
-					_result = object;
-					done();
-				}
-			};
-			device_controller.create(req, res);
+					var res = {
+						status: function(status_code) {
+							_status_code = status_code;
+						},
+						send: function(object) {
+							_result = object;
+							done();
+						}
+					};
+					device_controller.create(req, res);
+				});
+			});
 		});
 		it("should not create a new device", function(done) {
 			Device.count({}, function(err, count) {
@@ -241,8 +274,10 @@ describe('DeviceController', function() {
 			_status_code.should.equal(400);
 		});
 		after(function(done) {
-			Device.remove({}, function() {
-				done();
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					done();
+				});
 			});
 		});
 
@@ -254,22 +289,26 @@ describe('DeviceController', function() {
 		var _result;
 		var _status_code;
 		before(function(done) {
-			var req = {
-				body: _posted_model,
-				headers: []
-			};
+			User.remove({}, function() {
+				Device.remove({}, function() {
+					var req = {
+						body: _posted_model,
+						headers: []
+					};
 
 
-			var res = {
-				status: function(status_code) {
-					_status_code = status_code;
-				},
-				send: function(object) {
-					_result = object;
-					done();
-				}
-			};
-			device_controller.create(req, res);
+					var res = {
+						status: function(status_code) {
+							_status_code = status_code;
+						},
+						send: function(object) {
+							_result = object;
+							done();
+						}
+					};
+					device_controller.create(req, res);
+				});
+			});
 		});
 		it("should not create a new device", function(done) {
 			Device.count({}, function(err, count) {
@@ -291,9 +330,11 @@ describe('DeviceController', function() {
 
 	});
 	after(function(done) {
-		Device.remove({}, function() {
-			mongoose.disconnect(function() {
-				done();
+		User.remove({}, function() {
+			Device.remove({}, function() {
+				mongoose.disconnect(function() {
+					done();
+				});
 			});
 		});
 

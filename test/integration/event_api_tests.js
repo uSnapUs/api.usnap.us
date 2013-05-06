@@ -7,6 +7,7 @@ require("../../models/device");
 require("../../models/event");
 var Device = mongoose.model('Device');
 var Event = mongoose.model('Event');
+var User = mongoose.model('User');
 var nock = require('nock');
 var querystring = require('querystring');
 
@@ -17,14 +18,22 @@ describe('event api', function() {
 	var registered_device;
 	before(function(done) {
 		mongoose.connect(config.db);
-		registered_device = new Device({
-			name: "api test device",
-			guid: "api_test_guid",
-			email: "owen@usnap.us"
+		var registered_user = new User({
+			email: 'owen@usnap.us'
 		});
-		registered_device.save(function() {
-			done();
+		registered_user.save(function(err, user) {
+			registered_device = new Device({
+				name: "api test device",
+				guid: "api_test_guid",
+				user: user
+			});
+			registered_device.save(function() {
+				done();
+			});
 		});
+
+
+
 	});
 	describe('post new event, authorised as a registered device', function() {
 		var postParams, postParamsString;
@@ -71,10 +80,10 @@ describe('event api', function() {
 				done();
 			});
 		});
-		it('should send event created email',function(){
+		it('should send event created email', function() {
 			postParams.subject.should.equal("New Event Created");
 		});
-		it('should email event code',function(){
+		it('should email event code', function() {
 			postParams.text.should.equal(JSON.stringify(result.body))
 		});
 		after(function(done) {

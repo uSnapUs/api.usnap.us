@@ -18,7 +18,7 @@ exports.setupRoutes = function(app, passport, auth, config) {
   }), this.getByLocation);
 };
 exports.create = function(req, res) {
- 
+
   var ev = new Event(req.body);
   Event.findOne({
     id: ev.id
@@ -31,20 +31,19 @@ exports.create = function(req, res) {
     }
     existing_event.save(function(err, saved_event) {
       if (!err) {
-        if (req.user && req.user.email) {
-          console.log('sending email');
+        if (req.user && req.user.user && req.user.user.email) {
           sendgrid.send({
-            to: req.user.email,
+            to: req.user.user.email,
             from: "events@app.usnap.us",
             subject: 'New Event Created',
             text: JSON.stringify(saved_event.toJSON()),
           }, function(success, message) {
             if (!success) {
-              console.log(message);
+
 
             }
           });
-        }       
+        }
         res.send(saved_event);
       } else {
         res.status(400);

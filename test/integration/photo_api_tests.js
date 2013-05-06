@@ -7,6 +7,8 @@ require("../../models/device");
 require("../../models/event");
 var Device = mongoose.model('Device');
 var Event = mongoose.model('Event');
+var Photo = mongoose.model('Photo');
+var User = mongoose.model('User');
 var moment = require('moment');
 describe('photo api', function() {
 
@@ -14,11 +16,17 @@ describe('photo api', function() {
 	var result;
 	var registered_device;
 	var registered_event;
+	var registered_user;
 	before(function(done) {
 		mongoose.connect(config.db);
+		registered_user = new User({
+			email: "owen@usnap.us",
+			name: "test user"
+		});
 		registered_device = new Device({
 			name: "api test device",
-			guid: "api_test_guid"
+			guid: "api_test_guid",
+			user: registered_user
 		});
 		registered_event = new Event({
 			name: "My New Event",
@@ -30,9 +38,11 @@ describe('photo api', function() {
 			start_date: "2013-01-01T19:00:00",
 			end_date: "2013-01-02T00:00:00"
 		});
-		registered_device.save(function() {
-			registered_event.save(function(err, ev) {
-				done();
+		registered_user.save(function() {
+			registered_device.save(function() {
+				registered_event.save(function(err, ev) {
+					done();
+				});
 			});
 		});
 	});
@@ -76,6 +86,33 @@ describe('photo api', function() {
 				done();
 			});
 		});
+		it('should initialize the like count for the photo', function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].likes.should.equal(0);
+				done();
+			});
+		});
+		it('should also save the photo', function(done) {
+			Photo.count({}, function(err, count) {
+				count.should.equal(1);
+				done();
+			});
+		});
+		it('should save the user against the photo', function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].posted_by.toString().should.equal(registered_user._id.toString());
+				ev.photos[0].posted_by_device.toString().should.equal(registered_device._id.toString());
+				done();
+			});
+		});
+		it('should save correct photo id', function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				Photo.find({}, function(err, photos) {
+					photos[0]._id.toString().should.equal(ev.photos[0]._id.toString());
+					done();
+				});
+			});
+		});
 
 
 		after(function(done) {
@@ -84,8 +121,11 @@ describe('photo api', function() {
 					d.remove()
 				});
 				ev.save(function() {
-					done();
+					Photo.remove({}, function() {
+						done();
+					});
 				});
+
 			});
 
 		});
@@ -117,12 +157,15 @@ describe('photo api', function() {
 
 	});
 	describe('list photos with photo in event', function() {
-		var existing_photo = {
-			full_url: "full_url",
-			thumbnail_url: 'thumbnail_url',
-			root_url: "root"
-		};
+		var existing_photo;
 		before(function(done) {
+			existing_photo = {
+				full_url: "full_url",
+				thumbnail_url: 'thumbnail_url',
+				root_url: "root",
+				posted_by_device: registered_device,
+				posted_by: registered_user
+			};
 			Event.findById(registered_event.id, function(err, ev) {
 				ev.photos.push(existing_photo);
 				ev.save(function() {
@@ -141,6 +184,9 @@ describe('photo api', function() {
 		});
 		it('should return correct photo', function() {
 			result.body[0].full_url.should.equal(existing_photo.full_url);
+		});
+		it('should return user details', function() {
+			result.body[0].posted_by.name.should.equal(registered_user.name);
 		});
 		after(function(done) {
 			Event.findById(registered_event.id, function(err, ev) {
@@ -170,10 +216,10 @@ describe('photo api', function() {
 			Event.findById(registered_event.id, function(err, ev) {
 				ev.photos.push(existing_photo);
 				ev.save(function() {
-					
+					request_time = moment.utc();
 					Event.findById(registered_event.id, function(err, ev2) {
 						setTimeout(function() {
-							request_time = moment.utc();
+
 							ev2.photos.push(existing_photo2);
 							ev2.save(function() {
 								request(http.createServer(app))
@@ -184,7 +230,7 @@ describe('photo api', function() {
 									done();
 								});
 							});
-						},200);
+						}, 200);
 					});
 				});
 			});

@@ -9,17 +9,32 @@ var mongoose = require('mongoose')
   , _ = require('underscore')
   , authTypes = ['basic']
   ,timestamps = require('mongoose-timestamp');
+
+/**
+* User Schema
+*/
+var UserSchema = new Schema({
+  name:{type:String},
+  facebook_id:{type:String},
+  email:{type:String},
+});
+
+try {
+  mongoose.model('User');
+}catch(e){
+  mongoose.model('User', UserSchema);
+}
+
 /**
  * Device Schema
  */
 
 var DeviceSchema = new Schema({
   name: {type:String,required:true},
-  email: String,
   guid: {type:String,required:true},
-  facebook_id:String,
   hashed_token: String,
   salt: String,
+  user:{type : Schema.ObjectId, ref : 'User'}
 });
 DeviceSchema.plugin(timestamps);
 DeviceSchema.set('autoIndex', true);
@@ -126,5 +141,10 @@ DeviceSchema.methods = {
   },
 
 }
+try {
+  mongoose.model('Device');
+}catch(e){
+  mongoose.model('Device', DeviceSchema);
+}
 
-mongoose.model('Device', DeviceSchema)
+

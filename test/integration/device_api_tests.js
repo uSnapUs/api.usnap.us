@@ -85,6 +85,55 @@ describe('device api', function() {
 			});
 		});
 	});
+	describe('post update to existing device user, with no existing matching user, authenticated', function() {
+		var existing_device;
+		before(function(done) {
+			existing_device = new Device({
+				name: "existing name",
+				guid: "testguid"
+			});
+			existing_device.save(function() {
+				request(http.createServer(app))
+					.post('/devices')
+					.auth(existing_device.guid, existing_device.token)
+					.send({
+					name: 'existing name',
+					guid: 'testguid',
+					user:{
+						facebook_id:'facebook_id',
+						name:'my user',
+						email:'user@email.com'
+					}
+				})
+					.end(function(err, res) {
+					result = res;
+					done();
+				});
+
+			})
+
+		});
+		it('should return correct status', function() {
+			result.statusCode.should.equal(200);
+		});
+		it('should not create a new device', function(done) {
+			Device.count({}, function(err, count) {
+				count.should.equal(1);
+				done();
+			});
+		});
+		it('should add user to existing device', function(done) {
+			Device.findById(existing_device.id, function(err, device) {
+				device.user.should.exist;
+				done();
+			});
+		});
+		after(function(done) {
+			Device.remove({}, function() {
+				done();
+			});
+		});
+	});
 	describe('post update to existing device unauthenticated', function() {
 		var existing_device;
 		before(function(done) {
@@ -128,6 +177,7 @@ describe('device api', function() {
 			});
 		});
 	});
+
 	describe('post update to existing device authenticated as wrong device', function() {
 		var existing_device;
 		var existing_device2;

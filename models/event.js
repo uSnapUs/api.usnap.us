@@ -21,6 +21,8 @@ var PhotoSchema = new Schema({
   thumbnail_url:{type:String},
   full_url:{type:String},
   root_url:{type:String},
+  posted_by:{type : Schema.ObjectId, ref : 'User'},
+  posted_by_device:{type : Schema.ObjectId, ref : 'Device'},
   creation_time:{type:Date,default:Date.now}
 });
 
@@ -80,6 +82,15 @@ EventSchema.path('location.coordinates').validate(function (coordinates) {
 
 
 
-
-mongoose.model('Event', EventSchema)
-mongoose.model('Photo',PhotoSchema)
+try{
+  mongoose.model('Event');
+}
+catch(e){
+  mongoose.model('Event', EventSchema);  
+}
+try{
+  mongoose.model('Photo');
+}
+catch(e){
+  mongoose.model('Photo',PhotoSchema);
+}

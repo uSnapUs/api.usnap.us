@@ -18,7 +18,9 @@ var express = require('express'),
     mongoose = require('mongoose'),
     auth = require('./config/middleware/authorisation');
 
-  winston.add(winston.transports.File, { filename: 'default.log' });
+  winston.add(winston.transports.File, {
+    filename: 'default.log'
+  });
 
   //mongoose.set('debug', true);
 
@@ -32,18 +34,21 @@ var express = require('express'),
   })
 
   var app = express();
-  
+
   require('./config/express')(app, config, passport)
-  require('./config/routes')(app, passport, auth,config)
+  require('./config/routes')(app, passport, auth, config)
 
   var Device = mongoose.model('Device');
+  var User = mongoose.model('User');
 
   passport.use(new BasicStrategy(
 
   function(username, password, done) {
     Device.findOne({
       guid: username
-    }, function(err, device) {
+    })
+    .populate('user').
+    exec(function(err, device) {
       if (err) {
         return done(err);
       }
@@ -53,7 +58,8 @@ var express = require('express'),
       if (!device.authenticate(password)) {
         return done(null, false);
       }
-      return done(null, device);
+      return done(null,device);
+
     });
   }));
   module.exports = app;

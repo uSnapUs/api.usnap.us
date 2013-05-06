@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose'),
   Event = mongoose.model("Event"),
+  Photo = mongoose.model("Photo"),
   im = require('imagemagick'),
   _ = require('underscore'),
   crypto = require('crypto'),
@@ -20,14 +21,20 @@ exports.setupRoutes = function(app, passport, auth, config) {
     secret: config.aws.secret,
     bucket: config.aws.bucket
   });
-  app.post('/event/:event_code/photos', this.create);
-  app.get('/event/:event_code/photos',this.list);
+  app.post('/event/:event_code/photos', passport.authenticate('basic', {
+    session: false
+  }), this.create);
+  app.get('/event/:event_code/photos', passport.authenticate('basic', {
+    session: false
+  }), this.list);
 };
-exports.list = function(req,res){
+exports.list = function(req, res) {
   Event.findOne({
     code: req.params.event_code
-  }, function(err, existing_event) {
-     if (err) {
+  })
+  .populate('photos.posted_by')
+  .exec(function(err, existing_event) {
+    if (err) {
       res.status(400);
       res.send(err);
       return;
@@ -37,15 +44,14 @@ exports.list = function(req,res){
       return;
     } else {
       var photos = existing_event.photos;
-      if(req.query.since)
-      {
+      if (req.query.since) {
         var since_moment = moment(req.query.since);
-        
 
-        photos = _.filter(existing_event.photos,function(photo){
+
+        photos = _.filter(existing_event.photos, function(photo) {
           var creationDate = moment(photo.creation_time.getTime());
-         
-          return creationDate.diff(since_moment)>0;
+
+          return creationDate.diff(since_moment) > 0;
         });
       }
       res.status(200);
@@ -79,6 +85,16 @@ exports.create = function(req, res) {
         }
       })
       return;
+    } else if (!req.user.user) {
+      res.status(401);
+      res.send({
+        errors: {
+          user: {
+            message: 'user should be logged in'
+          }
+        }
+      });
+      return;
     } else {
       im.identify(req.files.photo.path, function(err, features) {
         if (err) throw err;
@@ -88,7 +104,9 @@ exports.create = function(req, res) {
           var photo = {
             thumbnail_url: '/photos/' + existing_event.code + '/' + file_name_base + "_thumbnail.png",
             full_url: '/photos/' + existing_event.code + '/' + file_name_base + ".png",
-            root_url: "https://s3.amazonaws.com/" + _s3Client.bucket
+            root_url: "https://s3.amazonaws.com/" + _s3Client.bucket,
+            posted_by: req.user.user,
+            posted_by_device:req.user
           }
 
           im.resize({
@@ -123,34 +141,39 @@ exports.create = function(req, res) {
                     fs.unlink(req.files.photo.path + "_full.png");
                     fs.unlink(req.files.photo.path);
 
-                    });
+                  });
 
-                  }
-                });
-              }
+                }
+              });
+            }
 
 
 
-            });
+          });
 
-          if(!existing_event.photos)
-          {
+          if (!existing_event.photos) {
             existing_event.photos = [];
           }
-          existing_event.photos.push(photo);
-          existing_event.save(function(err, saved_event) {
-            if (!err) {
-              res.send(photo);
-            } else {
-              res.status(400);
-              res.send(err);
-            }
-          });
-          };
-        });
-      }
 
-    });
+          var photo_model = new Photo(photo);
+
+
+          photo_model.save(function(err, saved_photo) {
+            existing_event.photos.push(saved_photo);
+            existing_event.save(function(err, saved_event) {
+              if (!err) {
+                res.send(photo);
+              } else {
+                res.status(400);
+                res.send(err);
+              }
+            });
+          });
+        };
+      });
+    }
+
+  });
 
   return;
-  };
+};
