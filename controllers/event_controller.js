@@ -57,7 +57,9 @@ exports.create = function(req, res) {
 exports.get = function(req, res) {
   Event.findOne({
     code: req.params.event_code
-  }, function(err, existing_event) {
+  })
+  .populate("photos.posted_by")
+  .exec(function(err, existing_event) {
 
     if (err) {
       res.status(400);
