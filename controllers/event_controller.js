@@ -91,7 +91,9 @@ exports.getByLocation = function(req, res) {
         $maxDistance: 2000
       }
     }
-  }, function(err, docs) {
+  })
+  .populate("photos.posted_by")
+  .exec(function(err, docs) {
     if (err) {
       res.status(500);
       res.send(err);
