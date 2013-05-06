@@ -128,6 +128,9 @@ describe('device api', function() {
 				done();
 			});
 		});
+		it('should return a user object in the response',function(){
+			result.body.user.name.should.equal('my user');
+		});
 		after(function(done) {
 			Device.remove({}, function() {
 				done();

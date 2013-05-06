@@ -18,7 +18,9 @@ exports.create = function(req, res, next) {
 
     Device.findOne({
       guid: device.guid
-    }, function(err, existing_device) {
+    })
+      .populate('user')
+      .exec(function(err, existing_device) {
       if (err || existing_device == null) {
         existing_device = device;
       } else {
@@ -30,9 +32,9 @@ exports.create = function(req, res, next) {
         existing_device.email = device.email;
         existing_device.name = device.name;
       }
-      var user = new User();
+      var user;
       if (req.body.user && req.body.user.facebook_id) {
-        user = new User(req.body.user);        
+        user = new User(req.body.user);
         User.findOne({
           facebook_id: user.facebook_id
         }, function(err, existing_user) {
@@ -40,25 +42,47 @@ exports.create = function(req, res, next) {
             user = existing_user;
           }
         });
-        existing_device.user = user;
+
 
       }
-      existing_device.save(function(err, saved_device) {
-        if (!err) {
-          user.save(function(err, saved_user) {
-            if (!err) {
-              res.send(saved_device);
-            } else {
-              res.status(400);
-              res.send(err);
-            }
-          });
-        } else {
-          res.status(400);
-          res.send(err);
-        }
 
-      });
+      if (user) {
+        existing_device.user = user;
+        user.save(function(err, saved_user) {
+          if (!err) {
+            existing_device.save(function(device_err, saved_device) {
+              if (!device_err) {
+                Device.findById(saved_device._id)
+                .populate('user')
+                .exec(function(load_err,d){
+                  d.token = saved_device.token;
+                  res.send(d);
+                });
+                
+              } else {
+                res.status(400);
+                res.send(device_err);
+              }
+
+            });
+          } else {
+            res.status(400);
+            res.send(err);
+          }
+
+        });
+
+      } else {
+        existing_device.save(function(device_err, saved_device) {
+          if (!device_err) {
+            res.send(saved_device);
+          } else {
+            res.status(400);
+            res.send(device_err);
+          }
+        });
+
+      }
     });
   })(req, res, next);
 };
