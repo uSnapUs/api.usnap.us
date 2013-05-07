@@ -123,7 +123,14 @@ exports.like = function(req, res) {
         })) {
 
           Photo.findById(existing_event.photos[photo_index]._id, function(photo_err, photo) {
+            if(!existing_event.photos[photo_index].liked_by){
+              existing_event.photos[photo_index].liked_by = [];
+            }
             existing_event.photos[photo_index].liked_by.push(req.user.user);
+            if(!photo.liked_by)
+            {
+              photo.liked_by = [];
+            }
             photo.liked_by.push(req.user.user);
             photo.save(function() {
               existing_event.save(function(err, doc) {
