@@ -34,7 +34,7 @@ exports.create = function(req, res, next) {
       }
       var user;
       if (req.body.user && req.body.user.facebook_id) {
-        delete req.body.user._id;
+        delete req.body.user.id;
         user = new User(req.body.user);
         User.findOne({
           facebook_id: user.facebook_id
