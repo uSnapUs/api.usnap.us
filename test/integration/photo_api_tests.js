@@ -253,6 +253,193 @@ describe('photo api', function() {
 		});
 
 	});
+	describe('like a photo, authenticated', function() {
+		var existing_photo = new Photo({
+			full_url: "full_url",
+			thumbnail_url: 'thumbnail_url',
+			root_url: "root"
+		});
+		var request_time;
+		before(function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos.forEach(function(d) {
+					d.remove()
+				});
+				existing_photo.save(function(photo_err,photo) {
+					ev.photos.push(photo);
+
+					ev.save(function(err, saved_event) {
+						existing_photo = photo;
+
+						request(http.createServer(app))
+							.post('/event/' + registered_event.code + '/photo/' + photo._id + "/like")
+							.auth(registered_device.guid, registered_device.token)
+							.end(function(err, res) {
+							result = res;
+							done();
+						});
+					});
+				});
+			});
+		});
+		it('should retun correct photo', function() {
+			result.body._id.should.equal(existing_photo._id.toString());
+		});
+		it('should return correct like count', function() {
+			result.body.likes.should.equal(1);
+		});
+		it('should save correct like count against the event photo collection', function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].likes.should.equal(1);
+				done();
+			});
+		});
+		it('should save correct like count against the photo', function(done) {
+			Photo.findById(existing_photo._id, function(err, photo) {
+				photo.likes.should.equal(1);
+				done();
+			});
+		});
+		after(function(done) {
+			Photo.remove({}, function() {
+				Event.findById(registered_event.id, function(err, ev) {
+					ev.photos.forEach(function(d) {
+						d.remove()
+					});
+					ev.save(function() {
+						done();
+					});
+				});
+			});
+		});
+
+	});
+	describe('like a photo already liked, authenticated', function() {
+		var existing_photo = new Photo({
+			full_url: "full_url",
+			thumbnail_url: 'thumbnail_url',
+			root_url: "root"
+		});
+		var request_time;
+		before(function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos.forEach(function(d) {
+					d.remove()
+				});
+				existing_photo.liked_by.push(registered_device.user);
+				existing_photo.save(function(photo_err,photo) {
+					ev.photos.push(photo);
+
+					ev.save(function(err, saved_event) {
+						existing_photo = photo;
+
+						request(http.createServer(app))
+							.post('/event/' + registered_event.code + '/photo/' + photo._id + "/like")
+							.auth(registered_device.guid, registered_device.token)
+							.end(function(err, res) {
+							result = res;
+							done();
+						});
+					});
+				});
+			});
+		});
+		it('should retun correct photo', function() {
+			result.body._id.should.equal(existing_photo._id.toString());
+		});
+		it('should return correct like count', function() {
+			result.body.likes.should.equal(1);
+		});
+		it('should save correct like count against the event photo collection', function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].likes.should.equal(1);
+				done();
+			});
+		});
+		it('should save correct like count against the photo', function(done) {
+			Photo.findById(existing_photo._id, function(err, photo) {
+				photo.likes.should.equal(1);
+				done();
+			});
+		});
+		after(function(done) {
+			Photo.remove({}, function() {
+				Event.findById(registered_event.id, function(err, ev) {
+					ev.photos.forEach(function(d) {
+						d.remove()
+					});
+					ev.save(function() {
+						done();
+					});
+				});
+			});
+		});
+
+	});
+
+	describe('unlike a photo already liked, authenticated', function() {
+		var existing_photo = new Photo({
+			full_url: "full_url",
+			thumbnail_url: 'thumbnail_url',
+			root_url: "root"
+		});
+		var request_time;
+		before(function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos.forEach(function(d) {
+					d.remove()
+				});
+				existing_photo.liked_by.push(registered_device.user);
+				existing_photo.save(function(photo_err,photo) {
+					ev.photos.push(photo);
+
+					ev.save(function(err, saved_event) {
+						existing_photo = photo;
+
+						request(http.createServer(app))
+							.del('/event/' + registered_event.code + '/photo/' + photo._id + "/like")
+							.auth(registered_device.guid, registered_device.token)
+							.end(function(err, res) {
+							result = res;
+							done();
+						});
+					});
+				});
+			});
+		});
+		it('should retun correct photo', function() {
+			result.body._id.should.equal(existing_photo._id.toString());
+		});
+		it('should return correct like count', function() {
+			result.body.likes.should.equal(0);
+		});
+		it('should save correct like count against the event photo collection', function(done) {
+			Event.findById(registered_event.id, function(err, ev) {
+				ev.photos[0].likes.should.equal(0);
+				done();
+			});
+		});
+		it('should save correct like count against the photo', function(done) {
+			Photo.findById(existing_photo._id, function(err, photo) {
+				photo.likes.should.equal(0);
+				done();
+			});
+		});
+		after(function(done) {
+			Photo.remove({}, function() {
+				Event.findById(registered_event.id, function(err, ev) {
+					ev.photos.forEach(function(d) {
+						d.remove()
+					});
+					ev.save(function() {
+						done();
+					});
+				});
+			});
+		});
+
+	});
+
 	after(function(done) {
 		Event.remove({}, function(err) {
 			Device.remove({}, function(err) {

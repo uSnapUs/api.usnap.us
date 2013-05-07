@@ -15,7 +15,6 @@ var mongoose = require('mongoose'),
 var _s3Client;
 
 exports.setupRoutes = function(app, passport, auth, config) {
-
   _s3Client = knox.createClient({
     key: config.aws.key,
     secret: config.aws.secret,
@@ -27,13 +26,134 @@ exports.setupRoutes = function(app, passport, auth, config) {
   app.get('/event/:event_code/photos', passport.authenticate('basic', {
     session: false
   }), this.list);
+  app.post('/event/:event_code/photo/:photo_id/like', passport.authenticate('basic', {
+    session: false
+  }), this.like);
+  app.delete('/event/:event_code/photo/:photo_id/like', passport.authenticate('basic', {
+    session: false
+  }), this.remove_like);
 };
+
+exports.remove_like = function(req, res) {
+  if (!req.user.user) {
+    res.status(401);
+    res.send("user must be logged in");
+    return;
+  }
+  Event.findOne({
+    code: req.params.event_code
+  })
+    .populate('photos.liked_by')
+    .exec(function(err, existing_event) {
+    if (err) {
+      res.status(400);
+      res.send(err);
+      return;
+    } else if (!existing_event) {
+      res.status(404);
+      res.send();
+      return;
+    } else {
+      var photo = _.find(existing_event.photos, function(photo) {
+        return photo._id.toString() == req.params.photo_id
+      });
+      if (!photo) {
+        res.status(404);
+        res.send();
+        return;
+      } else {
+        var photo_index = _.indexOf(existing_event.photos, photo);
+        var liked_user;
+        if ((liked_user = _.find(existing_event.photos[photo_index].liked_by, function(liked_by) {
+          return liked_by.equals(req.user.user);
+        }))) {
+          Photo.findById(existing_event.photos[photo_index]._id, function(photo_err, photo) {
+            existing_event.photos[photo_index].liked_by.pull(liked_user);
+            photo.liked_by.pull(liked_user);          
+            photo.save(function() {
+              existing_event.save(function(err, doc) {
+                res.status(200);
+                res.send(existing_event.photos[photo_index]);
+                return;
+              });
+            });
+          });
+        } else {
+          res.status(200);
+          res.send(existing_event.photos[photo_index]);
+          return;
+        }
+      }
+    }
+  });
+};
+
+
+exports.like = function(req, res) {
+  if (!req.user.user) {
+    res.status(401);
+    res.send("user must be logged in");
+    return;
+  }
+  Event.findOne({
+    code: req.params.event_code
+  })
+    .populate('photos.liked_by')
+    .exec(function(err, existing_event) {
+    if (err) {
+      res.status(400);
+      res.send(err);
+      return;
+    } else if (!existing_event) {
+      res.status(404);
+      res.send();
+      return;
+    } else {
+      var photo = _.find(existing_event.photos, function(photo) {
+        return photo._id.toString() == req.params.photo_id
+      });
+      if (!photo) {
+        res.status(404);
+        res.send();
+        return;
+      } else {
+        var photo_index = _.indexOf(existing_event.photos, photo);
+        if (!_.find(existing_event.photos[photo_index].liked_by, function(liked_by) {
+          return liked_by.equals(req.user.user);
+        })) {
+
+          Photo.findById(existing_event.photos[photo_index]._id, function(photo_err, photo) {
+            existing_event.photos[photo_index].liked_by.push(req.user.user);
+            photo.liked_by.push(req.user.user);
+            photo.save(function() {
+              existing_event.save(function(err, doc) {
+                res.status(200);
+                res.send(existing_event.photos[photo_index]);
+                return;
+              });
+            });
+
+          });
+
+        } else {
+          res.status(200);
+          res.send(existing_event.photos[photo_index]);
+          return;
+        }
+
+
+      }
+
+    }
+  });
+};
+
 exports.list = function(req, res) {
   Event.findOne({
     code: req.params.event_code
   })
-  .populate('photos.posted_by')
-  .exec(function(err, existing_event) {
+    .populate('photos.posted_by')
+    .exec(function(err, existing_event) {
     if (err) {
       res.status(400);
       res.send(err);
@@ -46,11 +166,8 @@ exports.list = function(req, res) {
       var photos = existing_event.photos;
       if (req.query.since) {
         var since_moment = moment(req.query.since);
-
-
         photos = _.filter(existing_event.photos, function(photo) {
           var creationDate = moment(photo.creation_time.getTime());
-
           return creationDate.diff(since_moment) > 0;
         });
       }
@@ -58,7 +175,8 @@ exports.list = function(req, res) {
       res.send(photos);
     }
   });
-}
+};
+
 exports.create = function(req, res) {
   Event.findOne({
     code: req.params.event_code
@@ -106,7 +224,7 @@ exports.create = function(req, res) {
             full_url: '/photos/' + existing_event.code + '/' + file_name_base + ".png",
             root_url: "https://s3.amazonaws.com/" + _s3Client.bucket,
             posted_by: req.user.user,
-            posted_by_device:req.user
+            posted_by_device: req.user
           }
 
           im.resize({
@@ -172,8 +290,6 @@ exports.create = function(req, res) {
         };
       });
     }
-
   });
-
   return;
 };

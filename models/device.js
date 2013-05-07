@@ -18,7 +18,7 @@ var UserSchema = new Schema({
   facebook_id:{type:String},
   email:{type:String},
 });
-
+UserSchema.plugin(timestamps);
 try {
   mongoose.model('User');
 }catch(e){

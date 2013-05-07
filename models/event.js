@@ -17,7 +17,7 @@ var mongoose = require('mongoose')
 * Photo Schema
 */
 var PhotoSchema = new Schema({
-  likes:{type:Number,default:0},
+  liked_by:[{type:Schema.ObjectId, ref : 'User'}],
   thumbnail_url:{type:String},
   full_url:{type:String},
   root_url:{type:String},
@@ -25,6 +25,13 @@ var PhotoSchema = new Schema({
   posted_by_device:{type : Schema.ObjectId, ref : 'Device'},
   creation_time:{type:Date,default:Date.now}
 });
+PhotoSchema.plugin(timestamps);
+
+PhotoSchema
+  .virtual('likes')
+  .get(function() { return this.liked_by.length; })
+PhotoSchema.set('toJSON',{virtuals:true});
+
 
 /**
  * Event Schema
@@ -41,7 +48,6 @@ var EventSchema = new Schema({
   photos:[PhotoSchema]
 });
 EventSchema.plugin(timestamps);
-PhotoSchema.plugin(timestamps);
 EventSchema.set('autoIndex', true);
 PhotoSchema.set('autoIndex', true);
 EventSchema.path('location.coordinates').required(true);
