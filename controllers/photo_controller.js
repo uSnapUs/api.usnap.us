@@ -123,6 +123,9 @@ exports.like = function(req, res) {
         })) {
 
           Photo.findById(existing_event.photos[photo_index]._id, function(photo_err, photo) {
+            if(!photo){
+              photo = new Photo(existing_event.photos[photo_index]);
+            }
             if(!existing_event.photos[photo_index].liked_by){
               existing_event.photos[photo_index].liked_by = [];
             }
