@@ -32,46 +32,45 @@ exports.create = function(req, res, next) {
         existing_device.email = device.email;
         existing_device.name = device.name;
       }
-      var user;
+
       if (req.body.user && req.body.user.facebook_id) {
         delete req.body.user.id;
-        user = new User(req.body.user);
+        var user = new User(req.body.user);
         User.findOne({
           facebook_id: user.facebook_id
         }, function(err, existing_user) {
           if (!err && existing_user) {
+            console.log('found existing user');
             user = existing_user;
           }
-        });
 
+          existing_device.user = user;
+          user.save(function(err, saved_user) {
+            if (!err) {
+              existing_device.save(function(device_err, saved_device) {
+                if (!device_err) {
+                  Device.findById(saved_device._id)
+                    .populate('user')
+                    .exec(function(load_err, d) {
+                    d.token = saved_device.token;
+                    res.send(d);
+                  });
 
-      }
+                } else {
+                  res.status(400);
+                  res.send(device_err);
+                }
 
-      if (user) {
-        existing_device.user = user;
-        user.save(function(err, saved_user) {
-          if (!err) {
-            existing_device.save(function(device_err, saved_device) {
-              if (!device_err) {
-                Device.findById(saved_device._id)
-                .populate('user')
-                .exec(function(load_err,d){
-                  d.token = saved_device.token;
-                  res.send(d);
-                });
-                
-              } else {
-                res.status(400);
-                res.send(device_err);
-              }
+              });
+            } else {
+              res.status(400);
+              res.send(err);
+            }
 
-            });
-          } else {
-            res.status(400);
-            res.send(err);
-          }
+          });
 
         });
+
 
       } else {
         existing_device.save(function(device_err, saved_device) {
@@ -82,8 +81,8 @@ exports.create = function(req, res, next) {
             res.send(device_err);
           }
         });
-
       }
+
     });
   })(req, res, next);
 };
